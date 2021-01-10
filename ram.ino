@@ -37,38 +37,24 @@ void setup()
   readRam(vgaxfb, ram_addr, VGAX_HEIGHT * VGAX_BWIDTH);
 }
 
-byte audio_intense()
-{
-  //TODO: base on actual audio input
-  int val = analogRead(A0);
-  if (val < 500 && val > 20) {
-    // constantly restarting gives intense glitchy output, also seems to corrupt something because it can result in smaller glitches which stay until vga.begin() is called again?
-    vga.begin();
-  }
-}
-
 int memptr = 0;
 int wait = 0;
 int threshold = 100; 
 
 byte audio_mem(bool hyper)
 {
-  //TODO: base on actual audio input
-  int val = analogRead(A0);
-  if (val > 500) {
-    if (hyper){
-      memptr++;
-    }
-    else if (wait ++ > threshold){
-      wait = 0;
-      memptr++;
-      threshold+=6 - (rand() % 20);
-      if (threshold <= 0){
-        threshold = rand()%200;
-      }
-    }
-    memcpy(vgaxfb, memptr, VGAX_HEIGHT * VGAX_BWIDTH);
+  if (hyper){
+    memptr++;
   }
+  else if (wait ++ > threshold){
+    wait = 0;
+    memptr++;
+    threshold+=6 - (rand() % 20);
+    if (threshold <= 0){
+      threshold = rand()%200;
+    }
+  }
+  memcpy(vgaxfb, memptr, VGAX_HEIGHT * VGAX_BWIDTH);
 }
 
 void loop()
@@ -77,9 +63,16 @@ void loop()
   byte y = rand() % VGAX_HEIGHT;
   byte pix = vga.getpixel(x, y);
 
-  audio_intense();
-
-  audio_mem(false);
+ //TODO: base on actual audio input
+  int val = analogRead(A0);
+  if (val < 500 && val > 20) {
+    // constantly restarting gives intense glitchy output, also seems to corrupt something because it can result in smaller glitches which stay until vga.begin() is called again?
+    vga.begin();
+  }
+  
+  if (val > 500) {
+    audio_mem(false);
+  }
 
   //TODO: maybe something faster? would also be nice if speed based on audio
   if (pix != 0) {
