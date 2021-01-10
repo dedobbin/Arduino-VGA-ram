@@ -19,7 +19,7 @@ void fill_ram()
     byte y = rand() % VGA_HEIGHT;
     byte clr = rand() % 3 + 1;
 
-https://github.com/smaffer/vgax/blob/master/VGAX.h
+    //https://github.com/smaffer/vgax/blob/master/VGAX.h
     byte *p = vga_data + y * VGA_BWIDTH + (x >> 2);
     byte bitpos = 6 - (x & 3) * 2;
     *p = (*p & ~(3 << bitpos)) | clr << bitpos;
@@ -33,7 +33,7 @@ void setup()
 {
   vga.begin();
   initRam();
-  //fill_ram();
+  fill_ram();
   readRam(vgaxfb, ram_addr, VGAX_HEIGHT * VGAX_BWIDTH);
 }
 
@@ -71,6 +71,7 @@ void loop()
   }
   
   if (val > 500) {
+    //TODO: make button to stay in this mode, perhaps alternate hyper on and off?
     audio_mem(false);
   }
 
