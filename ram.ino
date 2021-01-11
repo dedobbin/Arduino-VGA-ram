@@ -2,7 +2,7 @@
 #include <VGAX.h>
 
 int ram_addr = 0;
-int n_entries = 5;
+int n_entries = 500;
 
 VGAX vga;
 
@@ -77,6 +77,7 @@ void setup_clock4(){
 
 void setup()
 {
+  randomSeed(analogRead(A1));
   setup_clock4();
   vga.begin();
   initRam();
@@ -91,14 +92,14 @@ int threshold = 100;
 byte audio_mem(bool hyper)
 {
   if (hyper){
-    memptr++;
+    memptr += random(5)-10;
   }
   else if (wait ++ > threshold){
     wait = 0;
     memptr++;
-    threshold+=6 - (rand() % 20);
+    threshold+=6 - (random(20));
     if (threshold <= 0){
-      threshold = rand()%200;
+      threshold = random(100);
     }
   }
   memcpy(vgaxfb, memptr, VGAX_HEIGHT * VGAX_BWIDTH);
@@ -106,7 +107,7 @@ byte audio_mem(bool hyper)
 
 int last_used_audio_val = 0;
 bool stay = false;
-int stay_n = 1000;
+int stay_n = 40;
 void loop()
 {
   byte x = rand() % VGAX_WIDTH;
@@ -115,7 +116,7 @@ void loop()
 
   
   if (last_used_audio_val != last_audio_val){
-    if (last_audio_val > 7 || stay) {
+    if (last_audio_val > 9 || stay) {
       stay = true;
       audio_mem(true);
       stay_n --;
@@ -124,11 +125,19 @@ void loop()
         stay = false;
       }
     }
+
+    if (last_audio_val > 10){
+       audio_mem(false);
+    }
+
     
     if (last_audio_val > 10) {
+      // corrupt random memory, can cause crash of course, TODO: add watchdog to trigger reset
+      //memcpy(random(), random(),100);
+      
       // constantly restarting gives intense glitchy output, also seems to corrupt something because it can result in smaller glitches which stay until vga.begin() is called again?
-      //vga.begin();
-       readRam(vgaxfb, ram_addr, VGAX_HEIGHT * VGAX_BWIDTH);
+      vga.begin();
+      //readRam(vgaxfb, ram_addr, VGAX_HEIGHT * VGAX_BWIDTH);
     }
     last_used_audio_val = last_audio_val;
   }
@@ -148,24 +157,29 @@ void loop()
       vga.putpixel(x, y + 1, pix);
     }
 
-    if (rand() % 10 == 0) {
+    if (random(10) == 0) {
       vga.putpixel(x, y, rand() % 3 + 1);
     }
   }
 
-  //  for (int y=0;y<VGAX_HEIGHT;y++){
-  //    for (int x=0;x<VGAX_WIDTH;x++){
-  //      byte pix = vga.getpixel(x, y);
-  //      switch(pix){
-  //        case 0: //black
-  //          break;
-  //        case 1: //red
-  //          break;
-  //        case 2: //green
-  //          break;
-  //        case 3: // yellow
-  //          break;
-  //      }
-  //    }
-  //  }
+    for (int i=0;i<20;i++){
+      vga.putpixel(rand()%VGAX_WIDTH,rand()%VGAX_HEIGHT, 0);
+    }
+
+
+//    for (int y=0;y<VGAX_HEIGHT;y++){
+//      for (int x=0;x<VGAX_WIDTH;x++){
+//        byte pix = vga.getpixel(x, y);
+//        switch(pix){
+//          case 0: //black
+//            break;
+//          case 1: //red
+//            break;
+//          case 2: //green
+//            break;
+//          case 3: // yellow
+//            break;
+//        }
+//      }
+//    }
 }
