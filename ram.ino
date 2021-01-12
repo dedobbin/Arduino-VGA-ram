@@ -78,7 +78,7 @@ void setup_clock4(){
 void setup()
 {
   randomSeed(analogRead(A1));
-  setup_clock4();
+  //setup_clock4();
   vga.begin();
   initRam();
   //fill_ram();
@@ -116,27 +116,24 @@ void loop()
 
   
   if (last_used_audio_val != last_audio_val){
-    if (last_audio_val > 9 || stay) {
-      stay = true;
-      audio_mem(true);
-      stay_n --;
-      if (stay_n == 0){
-        stay_n = 10;
-        stay = false;
-      }
-    }
+//    if (last_audio_val > 9 || stay) {
+//      stay = true;
+//      audio_mem(true);
+//      stay_n --;
+//      if (stay_n == 0){
+//        stay_n = 10;
+//        stay = false;
+//      }
+//    }
 
     if (last_audio_val > 10){
        audio_mem(false);
     }
 
     
-    if (last_audio_val > 10) {
-      // corrupt random memory, can cause crash of course, TODO: add watchdog to trigger reset
-      //memcpy(random(), random(),100);
-      
+    if (last_audio_val > 10) {      
       // constantly restarting gives intense glitchy output, also seems to corrupt something because it can result in smaller glitches which stay until vga.begin() is called again?
-      vga.begin();
+      //vga.begin();
       //readRam(vgaxfb, ram_addr, VGAX_HEIGHT * VGAX_BWIDTH);
     }
     last_used_audio_val = last_audio_val;
@@ -162,9 +159,9 @@ void loop()
     }
   }
 
-    for (int i=0;i<20;i++){
-      vga.putpixel(rand()%VGAX_WIDTH,rand()%VGAX_HEIGHT, 0);
-    }
+//    for (int i=0;i<20;i++){
+//      vga.putpixel(rand()%VGAX_WIDTH,rand()%VGAX_HEIGHT, 0);
+//    }
 
 
 //    for (int y=0;y<VGAX_HEIGHT;y++){
