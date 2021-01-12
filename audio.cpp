@@ -8,7 +8,7 @@ int n_zero = 0;
 int last_read = 0;
 
 ISR(TIMER4_COMPA_vect){
-    //Pretty wonky setup to get some different results depending on type of sound, the higher the sound, the lower the number-ish, max is around 1100
+    //Pretty wonky setup to get some different results depending on type of sound, values depend on hz of isr on clock4
     int val = analogRead(A0);
     if (last_read == 0 && val == 0){
       n_zero ++;
