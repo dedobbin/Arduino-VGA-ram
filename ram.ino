@@ -1,5 +1,4 @@
 #include "sram.h"
-#include "audio.h"
 #include <VGAX.h>
 
 int ram_addr = 0;
@@ -30,66 +29,39 @@ void fill_ram()
 void setup()
 {
   randomSeed(analogRead(A1));
-  setup_clock4();
   vga.begin();
   initRam();
-  //fill_ram();
+  fill_ram();
   readRam(vgaxfb, ram_addr, VGAX_HEIGHT * VGAX_BWIDTH);
 }
 
-int memptr = 0;
-int wait = 0;
-int threshold = 10;
 
-byte audio_mem(bool hyper)
+int init_wait = 100;
+int wait = init_wait;
+int memptr = 0;
+byte vga_mess(bool hyper)
 {
   if (hyper) {
     memptr += random(5) - 10;
   }
-  else if (wait ++ > threshold) {
-    wait = 0;
-    memptr++;
-    threshold += 6 - (random(20));
-    if (threshold <= 0) {
-      threshold = random(10);
-    }
+  else if (--wait == 0) {
+    wait = init_wait;
+    memptr += random(5) - 10;
   }
   memcpy(vgaxfb, memptr, VGAX_HEIGHT * VGAX_BWIDTH);
 }
 
-int last_used_audio_val = 0;
-bool stay = false;
-int stay_n = 40;
 void loop()
 {
   byte x = rand() % VGAX_WIDTH;
   byte y = rand() % VGAX_HEIGHT;
   byte pix = vga.getpixel(x, y);
 
-  if (last_used_audio_val != last_audio_val) {
-    //    if (last_audio_val > 9 || stay) {
-    //      stay = true;
-    //      audio_mem(true);
-    //      stay_n --;
-    //      if (stay_n == 0){
-    //        stay_n = 10;
-    //        stay = false;
-    //      }
-    //    }
-    //
-    //    if (last_audio_val > 10){
-    //       audio_mem(false);
-    //    }
-    //
-    //
-    //    if (last_audio_val > 10) {
-    //      // constantly restarting gives intense glitchy output, also seems to corrupt something because it can result in smaller glitches which stay until vga.begin() is called again?
-    //      vga.begin();
-    //      readRam(vgaxfb, ram_addr, VGAX_HEIGHT * VGAX_BWIDTH);
-    //    }
+  int potVal = analogRead(A0);
 
-    last_used_audio_val = last_audio_val;
-  }
+  vga_mess(false);
+
+  
 
   //TODO: maybe something faster? would also be nice if speed based on audio
   if (pix != 0) {
