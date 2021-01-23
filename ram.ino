@@ -19,19 +19,16 @@ VGAX vga;
 
 void fill_ram()
 {
-  const int VGA_BWIDTH = 30;
-  const int VGA_HEIGHT = 60;
-  const int VGA_WIDTH = VGA_BWIDTH * 4;
-  byte vga_data[VGA_HEIGHT * VGA_BWIDTH];
+  byte vga_data[VGAX_HEIGHT * VGAX_BWIDTH];
   memset(vga_data, 0, sizeof(vga_data));
 
   for (int i = 0; i < n_entries; i++) {
     byte x = rand() % 30 * 4;
-    byte y = rand() % VGA_HEIGHT;
+    byte y = rand() % VGAX_HEIGHT;
     byte clr = rand() % 3 + 1;
 
     //https://github.com/smaffer/vgax/blob/master/VGAX.h
-    byte *p = vga_data + y * VGA_BWIDTH + (x >> 2);
+    byte *p = vga_data + y * VGAX_BWIDTH + (x >> 2);
     byte bitpos = 6 - (x & 3) * 2;
     *p = (*p & ~(3 << bitpos)) | clr << bitpos;
   }
