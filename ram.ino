@@ -7,6 +7,14 @@ int n_entries = 5;
 #define ANALOG_IN A0
 #define BUTTON_IN 8
 
+struct Mess_ctrl {
+  int memptr = 0;
+  int wait = 0;
+  int threshold = rand()%200; 
+};
+
+Mess_ctrl mess_ctrl;
+
 VGAX vga;
 
 void fill_ram()
@@ -41,24 +49,20 @@ void setup()
   readRam(vgaxfb, ram_addr, VGAX_HEIGHT * VGAX_BWIDTH);
 }
 
-int memptr = 0;
-int wait = 0;
-int threshold = rand()%200; 
-
-byte mess(bool hyper)
+void mess(bool hyper)
 {
   if (hyper){
-    memptr++;
+    mess_ctrl.memptr++;
   }
-  else if (wait ++ > threshold){
-    wait = 0;
-    memptr++;
-    threshold+=6 - (rand() % 20);
-    if (threshold <= 0){
-      threshold = rand()%200;
+  else if (mess_ctrl.wait ++ > mess_ctrl.threshold){
+    mess_ctrl.wait = 0;
+    mess_ctrl.memptr++;
+    mess_ctrl.threshold+=6 - (rand() % 20);
+    if (mess_ctrl.threshold <= 0){
+      mess_ctrl.threshold = rand()%200;
     }
   }
-  memcpy(vgaxfb, memptr, VGAX_HEIGHT * VGAX_BWIDTH);
+  memcpy(vgaxfb, mess_ctrl.memptr, VGAX_HEIGHT * VGAX_BWIDTH);
 }
 
 bool put_pixel(byte x,byte y, byte color)
