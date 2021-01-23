@@ -61,11 +61,27 @@ byte mess(bool hyper)
   memcpy(vgaxfb, memptr, VGAX_HEIGHT * VGAX_BWIDTH);
 }
 
+bool put_pixel(byte x,byte y, byte color)
+{
+    if (x >= 0 && x < VGAX_WIDTH && y >= 0 && y < VGAX_HEIGHT) {
+      vga.putpixel(x, y, color);
+      return true;
+    }
+    return false;
+}
+
+bool put_pixels_arround(byte x, byte y, byte color, byte dist)
+{
+  byte dimension = dist * 2 + 1;
+  for (int i=0;i<dimension;i++){
+    for (int j=0;j<dimension;j++){
+      put_pixel(i+x-dist, j+y-dist, color);
+    }
+  }
+}
+
 void loop()
 {
-  byte x = rand() % VGAX_WIDTH;
-  byte y = rand() % VGAX_HEIGHT;
-  byte pix = vga.getpixel(x, y);
 
   if (digitalRead(BUTTON_IN)){
     mess(true);
@@ -79,9 +95,12 @@ void loop()
   
   if (val > 500) {
     mess(false);
-  }
+  }  
 
   //TODO: maybe something faster? 
+  byte x = rand() % VGAX_WIDTH;
+  byte y = rand() % VGAX_HEIGHT;
+  byte pix = vga.getpixel(x, y);
   if (pix != 0) {
     if (x - 1 >= 0) {
       vga.putpixel(x - 1, y, pix);
