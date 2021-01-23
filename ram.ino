@@ -4,6 +4,9 @@
 int ram_addr = 0;
 int n_entries = 5;
 
+#define ANALOG_IN A0
+#define BUTTON_IN 8
+
 VGAX vga;
 
 void fill_ram()
@@ -31,15 +34,16 @@ void fill_ram()
 
 void setup()
 {
+  pinMode(BUTTON_IN, INPUT);
   vga.begin();
   initRam();
-  fill_ram();
+  //fill_ram();
   readRam(vgaxfb, ram_addr, VGAX_HEIGHT * VGAX_BWIDTH);
 }
 
 int memptr = 0;
 int wait = 0;
-int threshold = 100; 
+int threshold = rand()%200; 
 
 byte mess(bool hyper)
 {
@@ -63,18 +67,21 @@ void loop()
   byte y = rand() % VGAX_HEIGHT;
   byte pix = vga.getpixel(x, y);
 
-  int val = analogRead(A0);
+  if (digitalRead(BUTTON_IN)){
+    mess(true);
+  }
+  
+  int val = analogRead(ANALOG_IN);
   if (val < 500 && val > 20) {
-    // constantly restarting gives intense glitchy output, also seems to corrupt something because it can result in smaller glitches which stay until vga.begin() is called again?
+    // constantly restarting gives intense glitchy output
     vga.begin();
   }
   
   if (val > 500) {
-    //TODO: make button to stay in this mode, perhaps alternate hyper on and off?
     mess(false);
   }
 
-  //TODO: maybe something faster? would also be nice if speed based on audio
+  //TODO: maybe something faster? 
   if (pix != 0) {
     if (x - 1 >= 0) {
       vga.putpixel(x - 1, y, pix);
