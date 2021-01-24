@@ -5,7 +5,8 @@ int ram_addr = 0;
 int n_entries = 5;
 
 #define ANALOG_IN A0
-#define BUTTON_IN 8
+#define BUTTON_IN1 8
+#define BUTTON_IN2 4
 
 struct Mess_ctrl {
   int memptr = 0;
@@ -39,7 +40,8 @@ void fill_ram()
 
 void setup()
 {
-  pinMode(BUTTON_IN, INPUT);
+  pinMode(BUTTON_IN1, INPUT);
+  pinMode(BUTTON_IN2, INPUT);
   vga.begin();
   initRam();
   //fill_ram();
@@ -51,12 +53,13 @@ void mess(bool hyper)
   if (hyper){
     mess_ctrl.memptr++;
   }
+  
   else if (mess_ctrl.wait ++ > mess_ctrl.threshold){
     mess_ctrl.wait = 0;
     mess_ctrl.memptr++;
     mess_ctrl.threshold+=6 - (rand() % 20);
     if (mess_ctrl.threshold <= 0){
-      mess_ctrl.threshold = rand()%200;
+      mess_ctrl.threshold = rand()%200; //if %low, goes fast etc
     }
   }
   memcpy(vgaxfb, mess_ctrl.memptr, VGAX_HEIGHT * VGAX_BWIDTH);
@@ -84,42 +87,37 @@ bool put_pixels_arround(byte x, byte y, byte color, byte dist)
 void loop()
 {
 
-  if (digitalRead(BUTTON_IN)){
+  if (digitalRead(BUTTON_IN2)){
+    //TODO: maybe something faster? 
+    byte x = rand() % VGAX_WIDTH;
+    byte y = rand() % VGAX_HEIGHT;
+    byte pix = vga.getpixel(x, y);
+    if (pix != 0) {
+      if (x - 1 >= 0) {
+        vga.putpixel(x - 1, y, pix);
+      }
+      if (x + 1 < VGAX_WIDTH) {
+        vga.putpixel(x + 1, y, pix);
+      }
+      if (y - 1 >= 0) {
+        vga.putpixel(x, y - 1, pix);
+      }
+      if (y + 1 < VGAX_HEIGHT) {
+        vga.putpixel(x, y + 1, pix);
+      }
+  
+      if (rand() % 10 == 0) {
+        vga.putpixel(x, y, rand() % 3 + 1);
+      }
+    }
+  }
+  
+  else if (digitalRead(BUTTON_IN1)){
     mess(true);
-  }
-  
-  int val = analogRead(ANALOG_IN);
-  if (val < 500 && val > 20) {
-    // constantly restarting gives intense glitchy output
-    vga.begin();
-  }
-  
-  if (val > 500) {
+  } else{
     mess(false);
-  }  
-
-  //TODO: maybe something faster? 
-  byte x = rand() % VGAX_WIDTH;
-  byte y = rand() % VGAX_HEIGHT;
-  byte pix = vga.getpixel(x, y);
-  if (pix != 0) {
-    if (x - 1 >= 0) {
-      vga.putpixel(x - 1, y, pix);
-    }
-    if (x + 1 < VGAX_WIDTH) {
-      vga.putpixel(x + 1, y, pix);
-    }
-    if (y - 1 >= 0) {
-      vga.putpixel(x, y - 1, pix);
-    }
-    if (y + 1 < VGAX_HEIGHT) {
-      vga.putpixel(x, y + 1, pix);
-    }
-
-    if (rand() % 10 == 0) {
-      vga.putpixel(x, y, rand() % 3 + 1);
-    }
   }
+
 
   //  for (int y=0;y<VGAX_HEIGHT;y++){
   //    for (int x=0;x<VGAX_WIDTH;x++){
