@@ -5,7 +5,10 @@ Arduino sketch to to display data from RAM chip on VGA screen
 
 - 2 470Ω resistors
 - 2 68Ω resistors
+- 2 10KΩ resistors
 - 23LCV1024 chip (RAM)
+- Potmeter
+- 2 buttons
 
 # Dependencies
 [VGAX](https://github.com/smaffer/vgax)
