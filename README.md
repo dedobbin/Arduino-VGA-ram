@@ -14,5 +14,5 @@ Arduino sketch to to display data from RAM chip on VGA screen
 - Potmeter
 - 2 buttons
 
-# Dependencies
+## Dependencies
 [VGAX](https://github.com/smaffer/vgax)
